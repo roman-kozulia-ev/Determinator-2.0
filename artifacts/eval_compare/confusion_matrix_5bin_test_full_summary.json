@@ -1,0 +1,65 @@
+{
+  "model": "C:\\EagleView\\engineering\\Determinator\\Determinator2.0\\Determinator-2.0\\artifacts\\models\\xgboost_5bin.joblib",
+  "split": "test",
+  "n": 1705,
+  "classes": [
+    "1.0-1.5",
+    "2.0",
+    "2.5",
+    "3.0-3.5",
+    "4.0-5.0"
+  ],
+  "metrics": {
+    "accuracy": 0.5519061583577712,
+    "macro_f1": 0.5723243479899732,
+    "weighted_f1": 0.5506468335954391,
+    "mae_score": 0.37346041055718476,
+    "within_0.5": 0.6574780058651026,
+    "within_1.0": 0.8950146627565982,
+    "confusion_matrix": [
+      [
+        293,
+        125,
+        36,
+        15,
+        1
+      ],
+      [
+        179,
+        294,
+        110,
+        22,
+        0
+      ],
+      [
+        34,
+        70,
+        141,
+        63,
+        4
+      ],
+      [
+        3,
+        6,
+        38,
+        127,
+        32
+      ],
+      [
+        0,
+        0,
+        1,
+        25,
+        86
+      ]
+    ],
+    "confusion_labels": [
+      "1.0-1.5",
+      "2.0",
+      "2.5",
+      "3.0-3.5",
+      "4.0-5.0"
+    ]
+  },
+  "confusion_png": "C:\\EagleView\\engineering\\Determinator\\Determinator2.0\\Determinator-2.0\\artifacts\\eval_compare\\confusion_matrix_5bin_test_full.png"
+}

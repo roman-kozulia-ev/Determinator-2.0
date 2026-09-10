@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.py[cod]
+.cache/
+*.log
+.DS_Store
+Thumbs.db
+
+# Heavy / regenerable image caches (developed orthos + ROI crops)
+artifacts/eval_compare/raw/
+artifacts/eval_compare/roi/
+artifacts/eval_compare/input/
+
+# Intermediate per-split extract caches (keep only consolidated wide/*.npz)
+artifacts/features/*_wide_*.npz
+artifacts/features/*_wide_*.meta.json
+
+# Do not track scene-tag experiment leftovers if recreated
+artifacts/scene/

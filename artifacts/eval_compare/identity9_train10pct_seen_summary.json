@@ -1,0 +1,130 @@
+{
+  "model": "xgboost_identity9",
+  "split": "train",
+  "sample_fraction": 0.1,
+  "seed": 42,
+  "seen_by_model": true,
+  "n": 1363,
+  "metrics": {
+    "accuracy": 0.669112252384446,
+    "macro_f1": 0.777731314596479,
+    "weighted_f1": 0.6662197441209671,
+    "mae_score": 0.22413793103448276,
+    "within_0.5": 0.9053558327219369,
+    "within_1.0": 0.979457079970653,
+    "confusion_matrix": [
+      [
+        57,
+        3,
+        0,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        21,
+        204,
+        43,
+        27,
+        6,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        36,
+        109,
+        264,
+        79,
+        13,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        9,
+        10,
+        27,
+        174,
+        26,
+        6,
+        5,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        4,
+        9,
+        96,
+        4,
+        5,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        33,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        61,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        21
+      ]
+    ],
+    "confusion_labels": [
+      "1.0",
+      "1.5",
+      "2.0",
+      "2.5",
+      "3.0",
+      "3.5",
+      "4.0",
+      "4.5",
+      "5.0"
+    ]
+  },
+  "xlsx": "C:\\EagleView\\engineering\\Determinator\\Determinator2.0\\Determinator-2.0\\artifacts\\eval_compare\\identity9_train10pct_seen.xlsx",
+  "confusion_png": "C:\\EagleView\\engineering\\Determinator\\Determinator2.0\\Determinator-2.0\\artifacts\\eval_compare\\confusion_matrix_identity9_train10pct_seen.png"
+}
