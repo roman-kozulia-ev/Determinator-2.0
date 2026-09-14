@@ -13,3 +13,4 @@ artifacts/splits/
 artifacts/scene/
 artifacts/focusm_manifest.json
 artifacts/train_sample*
+tmp/
