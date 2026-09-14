@@ -73,3 +73,34 @@ python train_model.py --include-test
 ![Per-class metrics](docs/eval/per_class_holdout20.png)
 
 ![Confusion matrix](docs/eval/cm_holdout20.png)
+
+## Comparison with the old Determinator
+
+The original Determinator (VoteNet, 23 features) was trained on the **entire dataset with no train/val/test split**. To compare the two models fairly, both were evaluated on that same full set: **2601 images, 13005 ROIs**.
+
+The plots below are old pipeline vs this repo’s shipped model (`xgboost_9_class_13_feat`).
+
+| | Acc | P | R | F1 | MAE |
+|---|-----:|-----:|-----:|-----:|-----:|
+| Old | 0.376 | 0.221 | 0.253 | 0.216 | 0.459 |
+| New | 0.577 | 0.565 | 0.653 | 0.594 | 0.295 |
+
+**Old pipeline** (VoteNet / 23 features): accuracy **0.376**, macro-F1 **0.216**.
+
+![Old pipeline confusion](docs/eval/confusion_legacy.png)
+
+**New pipeline** (XGBoost / 13 features): accuracy **0.577**, macro-F1 **0.594**.
+
+![New pipeline confusion](docs/eval/confusion_new.png)
+
+Side by side:
+
+![Confusion matrices side by side](docs/eval/confusion_side_by_side.png)
+
+Classification metrics on the same ROI set:
+
+![Metrics comparison](docs/eval/metrics_comparison.png)
+
+Timing is a **CPU-only benchmark** for this test (no GPU). It is a relative baseline, not an on-aircraft number.
+
+![Timing comparison](docs/eval/timing_comparison.png)
