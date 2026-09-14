@@ -1,0 +1,46 @@
+{
+  "source_joblib": "artifacts/models/xgboost_9_class_13_feat.joblib",
+  "model_name": "xgboost_9_class_13_feat",
+  "booster_format": "xgboost_json",
+  "n_features": 13,
+  "feature_names": [
+    "fft_high_freq_ratio",
+    "Sobel2ndOrder5x5",
+    "grad_mean",
+    "Laplacian3x3",
+    "ThresholdGradient",
+    "Sobel2ndOrder3x3",
+    "roi_std",
+    "Vollath5",
+    "LaplacianOfGaussian",
+    "Sobel2ndOrder3x3Cross",
+    "entropy",
+    "modified_laplacian",
+    "Sobel2ndOrder5x5Cross"
+  ],
+  "n_classes": 9,
+  "classes": [
+    "1.0",
+    "1.5",
+    "2.0",
+    "2.5",
+    "3.0",
+    "3.5",
+    "4.0",
+    "4.5",
+    "5.0"
+  ],
+  "class_scores": [
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0,
+    3.5,
+    4.0,
+    4.5,
+    5.0
+  ],
+  "objective": "multi:softprob",
+  "notes": "C++: load .json with XGBoosterLoadModel; feed features in feature_names order; argmax of multi:softprob -> classes[i] / class_scores[i] as Haddock score."
+}
