@@ -78,12 +78,13 @@ python train_model.py --include-test
 
 The original Determinator (VoteNet, 23 features) was trained on the **entire dataset with no train/val/test split**. To compare the two models fairly, both were evaluated on that same full set: **2601 images, 13005 ROIs**.
 
-The plots below are old pipeline vs this repo’s shipped model (`xgboost_9_class_13_feat`).
+The plots below are old pipeline vs this repo’s shipped model (`xgboost_9_class_13_feat`). Acc, P, R, and F1 are reported as scores and **percentage-point** (pp) gaps — not relative percent, which overstates a jump from a low baseline. MAE is an error: lower is better, so the gap is an absolute drop on the Haddock scale.
 
 | | Acc | P | R | F1 | MAE |
 |---|-----:|-----:|-----:|-----:|-----:|
 | Old | 0.376 | 0.221 | 0.253 | 0.216 | 0.459 |
 | New | 0.577 | 0.565 | 0.653 | 0.594 | 0.295 |
+| Δ | +20.1 pp | +34.4 pp | +40.0 pp | +37.8 pp | −0.164 |
 
 **Old pipeline** (VoteNet / 23 features): accuracy **0.376**, macro-F1 **0.216**.
 
@@ -93,14 +94,24 @@ The plots below are old pipeline vs this repo’s shipped model (`xgboost_9_clas
 
 ![New pipeline confusion](docs/eval/confusion_new.png)
 
-Side by side:
+### Classification metrics
 
-![Confusion matrices side by side](docs/eval/confusion_side_by_side.png)
+![Classification metrics](docs/eval/metrics_comparison.png)
 
-Classification metrics on the same ROI set:
+**Accuracy.** Share of ROIs whose predicted Haddock class matches the label exactly. With nine 0.5-step bins, a 2.0 predicted as 2.5 counts as wrong.
 
-![Metrics comparison](docs/eval/metrics_comparison.png)
+**Precision (macro).** For each Haddock class, of the ROIs the model assigned that score, how many were actually that score; then average across the nine classes. High precision means fewer false calls of a given sharpness or softness level.
+
+**Recall (macro).** For each Haddock class, of the ROIs that truly have that score, how many the model found; then average. High recall means fewer missed soft (or sharp) ROIs of that class.
+
+**F1 (macro).** Harmonic mean of precision and recall per class, then averaged. It balances false alarms against misses across all nine scores, including rare bins such as 4.5.
+
+**MAE.** Mean absolute error on the Haddock scale (predicted score minus true score). Unlike accuracy, a 2.0 predicted as 2.5 is only 0.5 off. Lower is better: 0.295 vs 0.459 means the new model is closer on the ordinal scale.
+
+### Timing
 
 Timing is a **CPU-only benchmark** for this test (no GPU). It is a relative baseline, not an on-aircraft number.
+
+Feature extraction fell from 642.6 ms to 544.2 ms per 5 ROIs (**−15%**). Inference rose from 0.1 ms to 9.0 ms, still a small slice of wall time. End-to-end extract + infer fell from 642.8 ms to 553.2 ms (**−14%**).
 
 ![Timing comparison](docs/eval/timing_comparison.png)
