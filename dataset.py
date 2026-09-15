@@ -42,7 +42,12 @@ def assert_disjoint_splits(
     val_df: pd.DataFrame,
     test_df: pd.DataFrame,
 ) -> None:
-    """Raise if any image path appears in more than one split."""
+    """Raise if paths overlap across splits or duplicate within a split."""
+    for name, frame in (("train", train_df), ("val", val_df), ("test", test_df)):
+        if frame["path"].duplicated().any():
+            n = int(frame["path"].duplicated().sum())
+            raise RuntimeError(f"duplicate paths within {name} split ({n})")
+
     train_p, val_p, test_p = (
         set(train_df["path"]),
         set(val_df["path"]),
@@ -50,6 +55,13 @@ def assert_disjoint_splits(
     )
     if train_p & val_p or train_p & test_p or val_p & test_p:
         raise RuntimeError("overlapping paths between train/val/test")
+
+    n_rows = len(train_df) + len(val_df) + len(test_df)
+    n_unique = len(train_p | val_p | test_p)
+    if n_rows != n_unique:
+        raise RuntimeError(
+            f"path count mismatch: {n_rows} rows vs {n_unique} unique paths"
+        )
 
 
 def split_dataset(

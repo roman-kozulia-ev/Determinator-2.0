@@ -230,6 +230,19 @@ def consolidate_split_features(stem: str, feature_dir: Path) -> Path:
 
     out = feature_dir / "features.npz"
     out.parent.mkdir(parents=True, exist_ok=True)
+
+    ref_names = [str(x) for x in parts[0]["feature_names"]]
+    for role, part in zip(("train", "val", "test"), parts):
+        names = [str(x) for x in part["feature_names"]]
+        if names != ref_names:
+            raise ValueError(
+                f"feature_names mismatch: train={ref_names!r} vs {role}={names!r}"
+            )
+        if part["X"].shape[1] != len(ref_names):
+            raise ValueError(
+                f"{role} width {part['X'].shape[1]} != len(feature_names) {len(ref_names)}"
+            )
+
     np.savez_compressed(
         out,
         X=np.vstack([p["X"] for p in parts]),
@@ -237,7 +250,7 @@ def consolidate_split_features(stem: str, feature_dir: Path) -> Path:
         paths=np.concatenate([p["paths"] for p in parts]),
         rating_raw=np.concatenate([p["rating_raw"] for p in parts]),
         split=np.concatenate([p["split"] for p in parts]).astype(str),
-        feature_names=parts[0]["feature_names"],
+        feature_names=np.array(ref_names, dtype=object),
     )
     return out
 

@@ -55,14 +55,30 @@ Why this setup:
 
 C++: load the `.json`, pass the 13 features in `feature_names` order, take `argmax` of `multi:softprob`, map the index through `classes` / `class_scores` in the sidecar meta.
 
-## Testing
+## Testing / retrain
 
 Splits are **stratified by Haddock class** (80% train / 10% val / 10% test). Results below use VAL + TEST together (**20% holdout**, `n = 3409`).
 
+Shipped trees under `artifacts/models/` are ready to use. **Retraining** needs local (gitignored) data — `artifacts/train_sample.csv`, split CSVs, and `artifacts/features/features.npz` are **not** in the repo.
+
 ```bash
 pip install -r requirements.txt
+
+# 1) Place a labeled sample CSV at artifacts/train_sample.csv
+#    (columns: path, group, rating_raw; group is Haddock "1.0"…"5.0")
+
+# 2) Stratified train/val/test CSVs -> artifacts/splits/
+python train_model.py --make-splits --csv artifacts/train_sample.csv
+
+# 3) Extract the locked 13 features per split (needs image files on disk)
+python features.py --stem train_sample
+python features.py --stem train_sample --consolidate   # -> artifacts/features/features.npz
+
+# 4) Fit and export trees
 python train_model.py --include-test
 ```
+
+To retrain from an existing NPZ only, skip steps 1–3 and run step 4 with `--features path/to/features.npz`.
 
 ## Results
 

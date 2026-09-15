@@ -110,17 +110,50 @@ def compute_balanced_sample_weight(
     return sample_weight, class_to_weight
 
 
+def assert_nine_haddock_classes(data: dict[str, Any]) -> None:
+    """Require the NPZ labels match the nine Haddock classes in GROUP_TO_SCORE.
+
+    Train must contain every class so a model named *_9_class_* is honest.
+    Val/test may omit rare bins but must not introduce unknown labels.
+    """
+    expected = set(GROUP_TO_SCORE)
+    for role in ("train", "val", "test"):
+        labels = {str(g) for g in data[role]["groups"]}
+        unknown = labels - expected
+        if unknown:
+            raise ValueError(
+                f"{role} has unknown Haddock labels {sorted(unknown)}; "
+                f"expected subset of {sorted(expected)}"
+            )
+    train_labels = {str(g) for g in data["train"]["groups"]}
+    missing = expected - train_labels
+    if missing:
+        raise ValueError(
+            f"train is missing Haddock classes {sorted(missing)}; "
+            f"refusing to fit/export a 9-class model"
+        )
+
+
 def evaluate_predictions(
     y_true: np.ndarray,
     y_pred: np.ndarray,
+    class_names: list[str],
 ) -> dict[str, float]:
-    """Accuracy, macro-F1, and ordinal MAE on Haddock scores."""
+    """Accuracy, 9-class macro-F1, and ordinal MAE on Haddock scores."""
     true_s = _scores_from_labels(y_true)
     pred_s = _scores_from_labels(y_pred)
     delta = np.abs(true_s - pred_s)
     return {
         "accuracy": float(accuracy_score(y_true, y_pred)),
-        "macro_f1": float(f1_score(y_true, y_pred, average="macro", zero_division=0)),
+        "macro_f1": float(
+            f1_score(
+                y_true,
+                y_pred,
+                labels=class_names,
+                average="macro",
+                zero_division=0,
+            )
+        ),
         "mae_score": float(np.mean(delta)),
         "within_0.5": float(np.mean(delta <= 0.5)),
         "within_1.0": float(np.mean(delta <= 1.0)),
@@ -137,15 +170,19 @@ def train_and_evaluate(
 ) -> Path:
     """Fit XGBoost, write `{model_name}.joblib`, and export C++ JSON trees."""
     data = load_feature_splits(features_npz)
+    assert_nine_haddock_classes(data)
+
     names = data["feature_names"]
     X_train, feature_names = select_feature_columns(names, data["train"]["X"])
     X_val, _ = select_feature_columns(names, data["val"]["X"])
     X_test, _ = select_feature_columns(names, data["test"]["X"])
 
+    # Fit on the canonical nine labels so encoder order matches GROUP_TO_SCORE.
+    class_names = list(GROUP_TO_SCORE.keys())
     enc = LabelEncoder()
-    y_train = enc.fit_transform(data["train"]["groups"])
+    enc.fit(class_names)
+    y_train = enc.transform(data["train"]["groups"])
     y_val = enc.transform(data["val"]["groups"])
-    class_names = [str(c) for c in enc.classes_]
 
     fit_kwargs: dict[str, Any] = {}
     if use_balanced_class_weight:
@@ -157,7 +194,7 @@ def train_and_evaluate(
 
     y_true = enc.inverse_transform(y_val)
     y_pred = enc.inverse_transform(model.predict(X_val))
-    val = evaluate_predictions(y_true, y_pred)
+    val = evaluate_predictions(y_true, y_pred, class_names)
     print(
         f"VAL acc={val['accuracy']:.3f}  macro_f1={val['macro_f1']:.3f}  "
         f"MAE={val['mae_score']:.3f}  ±0.5={val['within_0.5']:.3f}  "
@@ -169,6 +206,7 @@ def train_and_evaluate(
         test = evaluate_predictions(
             enc.inverse_transform(y_test),
             enc.inverse_transform(model.predict(X_test)),
+            class_names,
         )
         print(
             f"TEST acc={test['accuracy']:.3f}  macro_f1={test['macro_f1']:.3f}  "
